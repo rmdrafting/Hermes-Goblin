@@ -1,0 +1,10 @@
+.env
+.env.*
+.hermes/
+node_modules/
+*.backup-*
+goblin-roleplay-backup*.json
+character-card.json
+private/
+memories/
+*.zip

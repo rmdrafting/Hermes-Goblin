@@ -1,0 +1,247 @@
+{
+  "format": "goblin_amendments_v1",
+  "version": 1,
+  "name": "Randy Creative Amendments",
+  "amendments": [
+    {
+      "id": "one_prompt",
+      "name": "One prompt \u2014 negatives built in",
+      "category": "All models",
+      "exclusive_group": "negative_format",
+      "enabled": false,
+      "text": "Return one generator prompt. Integrate essential exclusions naturally into the scene wording rather than adding a NEGATIVE PROMPT section. Prefer desired states such as a single subject, intact anatomy, separated hands, clean background, consistent identity and stable geometry. Use short no/without clauses only where they clarify intent. Do not insert a long defect list into positive conditioning. This is wording guidance, not equivalent to a model\u2019s negative-conditioning input. For Story Creator keep these constraints in the visual portion of each scene line; for chains integrate them within each PART. Preserve required parser syntax."
+    },
+    {
+      "id": "separate_negative",
+      "name": "Separate negative field",
+      "category": "All models",
+      "exclusive_group": "negative_format",
+      "enabled": false,
+      "text": "When the workflow actually supports separate negative conditioning, output POSITIVE PROMPT and NEGATIVE PROMPT separately. Keep negatives short and specific to the task. Do not use this option for a script parser that accepts only scene lines. If the selected model/workflow ignores negatives, say so briefly rather than inventing a field."
+    },
+    {
+      "id": "detail",
+      "name": "Rich but purposeful detail",
+      "category": "All models",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "Build detailed prompts from useful visual information: subject, action, spatial relationships, material, light, camera and atmosphere. Expand details that affect the image or movement. Avoid repetitive quality words, contradictory adjectives and padding. Produce a polished final prompt rather than a vague idea."
+    },
+    {
+      "id": "only",
+      "name": "Ready to paste only",
+      "category": "All models",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "Return only the requested production text. No greeting, explanation, sales pitch, rationale or optional follow-up. Preserve required WORLD, PART, field labels and delimiters when the requested workflow needs them. Keep technical settings outside generator text; omit them unless requested."
+    },
+    {
+      "id": "decide",
+      "name": "Make reasonable creative choices",
+      "category": "All models",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "When small creative details are missing, choose a coherent option and continue. Ask only if missing information blocks the task or changes the intended format. Preserve explicitly supplied choices. Do not substitute a tutorial for the requested prompt."
+    },
+    {
+      "id": "real",
+      "name": "Photographic reality",
+      "category": "Visual style",
+      "exclusive_group": "style",
+      "enabled": false,
+      "text": "Use believable photographic people, environments and materials. Describe natural skin texture, realistic hair, fabric behavior, motivated light and plausible lens perspective. Keep anatomy coherent. Avoid plastic skin, mannequin expressions and excessive sharpening through positive visual description. Do not automatically turn people into anime or stylized 3D characters."
+    },
+    {
+      "id": "psychedelic",
+      "name": "Photographic Reality + Psychedelic Physics",
+      "category": "Visual style",
+      "exclusive_group": "style",
+      "enabled": false,
+      "text": "Start from photographic people and tangible real environments. Introduce a small number of deliberate psychedelic effects: warm haze, temporal echoes, localized melting geometry, rhythmic distortion or selective ink trails. Keep the main subject readable and identity stable. For video, describe when each effect begins, how it follows movement and whether reality settles back. Do not pile every effect into every shot."
+    },
+    {
+      "id": "dark",
+      "name": "Painterly Dark Dream Surrealism",
+      "category": "Visual style",
+      "exclusive_group": "style",
+      "enabled": false,
+      "text": "Create an immersive painterly world that feels dreamy, moody, strange and quietly menacing. Favor environments, mystery, lonely atmosphere, rich shadow and restrained luminous color. Let unusual architecture and landscape carry the image. Do not automatically make a woman the central subject. For motion, prefer slow atmospheric change."
+    },
+    {
+      "id": "royo",
+      "name": "Biomechanical gothic sculpture",
+      "category": "Visual style",
+      "exclusive_group": "style",
+      "enabled": false,
+      "text": "Interpret Royo Style here as a monochrome resin collectible sculpture: recognizable anatomy integrated with skeletal architecture, grown machinery, repeating ribs and tubes, gothic ornament and Victorian mechanical detail. Include purposeful structural supports and an integrated display base when appropriate. Machinery should look connected and load-bearing rather than randomly pasted on. Preserve a readable silhouette."
+    },
+    {
+      "id": "identity",
+      "name": "Character and wardrobe lock",
+      "category": "Continuity",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "Repeat essential character identity, hairstyle, proportions, costume colors and distinctive accessories consistently across separate prompts. Keep object ownership and left/right placement coherent. In image-guided motion preserve the visible starting appearance. Do not promise perfect identity preservation from text alone."
+    },
+    {
+      "id": "image_ratio",
+      "name": "Follow the starting image",
+      "category": "Continuity",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "For an attached starting image, preserve its composition and aspect-ratio intent unless the user asks for a reframe. Do not crop away important limbs or objects. State an aspect-ratio preference separately only if useful; do not claim that prompt text changes workflow dimensions. If no image is provided, proceed normally."
+    },
+    {
+      "id": "3d",
+      "name": "Image-to-3D source",
+      "category": "Image task",
+      "exclusive_group": "image_task",
+      "enabled": false,
+      "text": "Prepare one isolated complete object with readable solid forms, plain contrasting background, soft diffuse lighting and generous margins. Prefer a neutral three-quarter view with minimal occlusion. Keep all parts in frame and avoid transparent or heavily reflective surfaces unless essential. Do not include text, a collage or multiple views in one input unless the reconstruction tool supports it. This produces a source-image prompt, not a mesh."
+    },
+    {
+      "id": "views",
+      "name": "Front / side / rear references",
+      "category": "Image task",
+      "exclusive_group": "image_task",
+      "enabled": false,
+      "text": "Produce three separate prompts labeled FRONT, SIDE and REAR, repeating identity, proportions, materials, clothing and scale in each. Keep neutral lighting and orthographic-looking framing. Ensure accessories agree across views. Do not promise exact geometric consistency; a generated triptych still requires inspection before 3D reconstruction."
+    },
+    {
+      "id": "keyframes",
+      "name": "First and last reference images",
+      "category": "Image task",
+      "exclusive_group": "image_task",
+      "enabled": false,
+      "text": "Produce FIRST FRAME and LAST FRAME as complete independent still-image prompts. Match character, wardrobe, environment, light and camera logic. The first shows the start state; the last shows a physically reachable ending state. Put a brief motion bridge outside those prompts unless prompt-only mode is enabled. Do not assume the downstream video workflow supports a last-frame input."
+    },
+    {
+      "id": "sheet",
+      "name": "Character reference sheet",
+      "category": "Image task",
+      "exclusive_group": "image_task",
+      "enabled": false,
+      "text": "Create a clean character-reference sheet with the requested views, consistent identity and wardrobe, neutral lighting and uncluttered background. Separate views clearly without decorative framing. If the target requires individual images, output separate prompts instead of a collage. Avoid unrequested expression or costume variations."
+    },
+    {
+      "id": "batch",
+      "name": "Cohesive scene batch",
+      "category": "Image task",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "For a batch, output one self-contained prompt per scene and repeat necessary continuity in each. Never write same as above. Suggest numbered filenames only when requested, and never claim they were saved without an actual successful file operation."
+    },
+    {
+      "id": "h3_single",
+      "name": "MiniMax \u2014 one cinematic shot",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Write one uninterrupted shot with a clear initial state, one primary action and a readable ending. Use one compatible camera move or a locked camera. Describe weight, contact, direction and follow-through. No unrequested cuts, costume changes, sudden teleports or unrelated action lists. Use seconds, never frames."
+    },
+    {
+      "id": "h3_i2v",
+      "name": "MiniMax \u2014 animate the image",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Use the visible image as the first-frame anchor. Prioritize a chronological description of subject motion, environmental motion and restrained camera movement. Preserve identity, framing and lighting unless a change is requested. Do not restate every static detail or invent unseen image facts. If vision is unavailable, ask for a description."
+    },
+    {
+      "id": "h3_refs",
+      "name": "MiniMax \u2014 reference-guided scene",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Assign each provided reference a clear role such as character identity, environment, wardrobe, pose or style. Distinguish reference guidance from an actual first frame. Use only supplied references and supported workflow slots. Keep the reference-role map outside the final prompt unless the workflow documents inline reference syntax. Do not invent special tokens."
+    },
+    {
+      "id": "story_setup",
+      "name": "Story Creator \u2014 World and setup",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Return WORLD, STORY IDEA, STYLE, CHARACTER, MUSIC STYLE and NARRATOR as separate labeled fields. WORLD describes setting and visual rules; STORY IDEA supplies the plot; CHARACTER includes repeatable appearance. Music and narrator may be OFF. Do not output a full script unless requested. Honor a request for detailed setup without filling it with unrelated lore."
+    },
+    {
+      "id": "story_script",
+      "name": "Story Creator \u2014 complete scene script",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Write the complete requested script, not a synopsis. For the confirmed Frizzy scene-list format, use WORLD: first, then one physical line per scene: [camera] visible action || audio. Repeat location and identifying appearance per scene. Use plain narration or Name: dialogue after the delimiter, and leave audio empty for silent scenes. Keep speech short. Use [continue] only for a transition into the next scene image. Follow the installed workflow schema if supplied. Avoid numbering inside parser text."
+    },
+    {
+      "id": "chain",
+      "name": "Chain Director \u2014 matching Parts",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Output PART 1 through the requested PART N. Every part must start from the preceding endpoint: same pose, camera placement, screen direction, props, wardrobe and lighting. Repeat essential continuity so each prompt stands alone. Give the action and endpoint explicitly. Keep durations in seconds outside the paste block unless the parser requires them. Plan last-frame chaining without claiming it is automatically wired."
+    },
+    {
+      "id": "short",
+      "name": "Image scene \u2014 maximum 15 seconds",
+      "category": "MiniMax mode",
+      "exclusive_group": "video_mode",
+      "enabled": false,
+      "text": "Turn the supplied image into one 1\u201315 second scene; default to 8 seconds when no duration is given. Use one main action and at most one camera move. Keep the final moment readable. Do not exceed 15 seconds silently; offer a chain for longer ideas. Duration remains a creative target subject to actual node limits."
+    },
+    {
+      "id": "loop",
+      "name": "Loopable motion",
+      "category": "Video option",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "Use cyclic motion that returns close to its starting pose, environment state, lighting and camera position. Avoid a one-way camera push or irreversible event unless the user accepts a reset. Keep start/end continuity explicit. Do not guarantee a seamless loop before inspecting the render."
+    },
+    {
+      "id": "dance",
+      "name": "Specific dance and rhythmic movement",
+      "category": "Video option",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "Describe a short readable movement sequence: weight shift, footwork, torso movement, arm gesture and recovery. Name approximate energy and tempo qualitatively. Keep feet grounded and motion achievable in the clip duration. If a soundtrack exists, express rhythmic intent but do not promise exact beat synchronization from prompting alone."
+    },
+    {
+      "id": "audio_off",
+      "name": "No music or narrator",
+      "category": "Audio",
+      "exclusive_group": "audio_mode",
+      "enabled": false,
+      "text": "Set music and narrator OFF where those fields exist. Do not add dialogue, lyrics or soundtrack instructions. Ambient sound is allowed only if the user requests it; otherwise keep audio silent or unspecified according to workflow capability."
+    },
+    {
+      "id": "music",
+      "name": "Music and ambience, no narrator",
+      "category": "Audio",
+      "exclusive_group": "audio_mode",
+      "enabled": false,
+      "text": "Keep narrator OFF. Give optional music as a separate concise field describing mood, instrumentation, tempo feel and energy. Add scene-appropriate ambience if requested. Do not add spoken dialogue or claim that audio is generated by a workflow without audio support."
+    },
+    {
+      "id": "narrator",
+      "name": "Narrator with restrained music",
+      "category": "Audio",
+      "exclusive_group": "audio_mode",
+      "enabled": false,
+      "text": "Specify narrator tone, pace and delivery separately from actual spoken lines. Keep narration short enough for the clip, with pauses and intelligible phrasing. Suggest restrained instrumental music beneath it only if requested. Do not include stage directions in text intended to be spoken."
+    },
+    {
+      "id": "qwen_edit",
+      "name": "Qwen \u2014 precise reference edit",
+      "category": "Model option",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "For Qwen editing, lead with the desired change and then identify the features to preserve. Give each reference image a consistent role. Keep face, clothing, composition or background unchanged only where requested. Put exact visible text in quotation marks. Do not overwrite the entire scene to perform a small edit or assume every upstream feature exists in the local node."
+    },
+    {
+      "id": "pony",
+      "name": "Pony \u2014 organized tag prompt",
+      "category": "Model option",
+      "exclusive_group": null,
+      "enabled": false,
+      "text": "Use a concise Pony-compatible tag structure and a coherent visual description. Apply V6 score conventions only when the checkpoint is V6-compatible; never add those tags to Krea or Qwen. Focus on subject, pose, costume, scene, composition and light. If one-prompt mode is active, omit the separate negative block and phrase constraints within the positive prompt without adding a long list of unwanted defects."
+    }
+  ]
+}

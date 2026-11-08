@@ -4,15 +4,19 @@
 
 A native Hermes Desktop companion plugin with character cards, lorebooks, switchable amendments, portraits, persistent character/story memory, and optional action/dialogue colors.
 
-## Experimental project — use at your own risk
+## Disclaimer: this goblin is unsupervised
 
-I'm building and experimenting with this on my own PC. This is a personal hobby project, not a professionally tested product. Something working on my machine does not mean it will work on yours.
+I'm building this on my own PC, experimenting, and occasionally saying, “Well, that wasn't supposed to happen.” This is a personal hobby project—not a professionally tested product with a quality-assurance department. The department is me. On my PC.
+
+**It works on my machine is a progress report, not a warranty.**
 
 This software is provided **as is**, without warranties or guarantees of reliability, security, compatibility, accuracy, or fitness for any particular purpose. To the fullest extent permitted by applicable law, the author and contributors disclaim liability for losses, damages, data loss, unexpected behavior, or costs arising from using or modifying it.
 
-You are responsible for deciding whether to install it, backing up your data, reviewing AI-generated content and actions, and managing your model/API usage and charges. Features may break or change, and ongoing updates or support are not guaranteed.
+You are responsible for deciding whether to install it, keeping backups, reviewing AI-generated content and actions, and managing your model/API usage and charges. The goblin does not have a credit card and will not reimburse yours.
 
-**In plain English: I'm experimenting and sharing what I build. Use it at your own risk, and keep backups.**
+Features may break, change, or develop an exciting new interpretation of “working.” Updates and support happen when I can manage them; neither is guaranteed. If your character forgets her favorite color, that's a bug—not evidence she's entering her mysterious era.
+
+**In plain English: I'm sharing my experiments. Use at your own risk. Back up your stuff. Don't put the goblin in charge of anything you can't afford to lose.**
 
 ## Install or update (Windows)
 

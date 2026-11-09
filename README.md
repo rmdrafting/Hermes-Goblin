@@ -1,4 +1,4 @@
-# Hermes Goblin 3.1
+# Hermes Goblin 3.1.2
 
 > Bringing Hermes to life.... good thing? i dont know...
 
@@ -22,7 +22,7 @@ Features may break, change, or develop an exciting new interpretation of “work
 
 1. Close Hermes Desktop.
 2. Extract the entire ZIP. Run `INSTALL_WINDOWS.bat` from the extracted folder.
-3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.0**.
+3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.2**.
 4. Open a chat and wait for its first reply. Select a character and click **Enable for this chat**.
 
 The plugin keeps the `goblin-roleplay` ID and `settings` storage key, preserving existing cards, faces and amendments. The installer backs up the previous JavaScript file. It uses `HERMES_HOME` if set, otherwise `%USERPROFILE%\.hermes`. A custom Hermes data directory requires copying `goblin-roleplay/plugin.js` into that instance's `desktop-plugins/goblin-roleplay` folder.
@@ -52,6 +52,26 @@ A preference may change naturally, but a changed value with the same label goes 
 Click **Forget** to stop a fact appearing in future injected prompts. This does not delete earlier transcript text, provider logs or Hermes's independent memory. Memories persist in local plugin storage. They are sent to the currently selected model as prompt context while enabled. Exported settings backups contain memories, imported cards and portrait data; keep them private. No user backups, personal cards or chat transcripts ship in this source package.
 
 Memory limits: 60 facts per shelf, 800 characters per fact, 40 pending suggestions per character. Overall injected guidance is capped at 24,000 characters. If exceeded, shorten memories/cards/amendments; sending is cancelled with an explanation rather than silently dropping memories.
+
+## Character freedom
+
+Under **Character freedom**, choose **Reserved**, **Balanced**, or **Adventurous** (default). Each character has separate switches for introducing small story events, suggesting activities, and developing new preferences. These control the model's replies; they do not schedule unsolicited messages or unattended activity.
+
+Boundaries instruct the character to preserve your agency and consent, avoid emotional pressure, keep its core identity stable, and distinguish fictional events from real user facts. Turning preference development off also blocks automatic character-fact capture; manual editing remains available. Existing preferences and story-event memory still work.
+
+These are prompt instructions, not an enforced security sandbox. The plugin does not change Hermes tool permissions. Keep real-world tool approvals configured in Hermes. Disabling Goblin triggers no file operations or automatic execution of earlier discussion.
+
+## Recall past stories (3.1.2)
+
+**Recall relevant earlier chapters** is the default per character. It searches saved story notes by keyword overlap with your outgoing message, includes at most four matching facts (2,400 characters), and makes no extra model call. Asking to remember/recap without a specific topic can retrieve recent ancestor notes. This is lightweight keyword matching, not semantic search or access to old Hermes transcripts.
+
+- **Current story only:** no earlier chapter notes injected.
+- **Recall relevant earlier chapters:** matching notes from this chapter's ancestors only.
+- **Ask before recalling:** the model is prompted to ask; no old facts are injected until you check **Allow recall in this chapter** and send another message. Permission lasts for that chapter and can be unchecked.
+
+To continue: select your previous story under **Continue a story**, then click **New chapter — same storyline**. To start independently: click **Fresh alternate storyline**. Alternate timelines, sibling branches, other characters and later chapters are excluded from recall. Persistent character preferences still apply across that character's timelines.
+
+Existing stories are preserved as independent timelines because their relationships were never recorded. Continue from one to build connected chapters; existing unrelated stories are not automatically merged. New Hermes chats initially get independent stories; choose an older one before creating a connected chapter. Use separate Hermes chats when separating timelines, since the plugin cannot remove already-visible transcript history.
 
 ## Chat colors
 
@@ -94,7 +114,7 @@ Tests cover durable IDs, persistence, migrations, separate character/story memor
 
 Repository: https://github.com/rmdrafting/Hermes-Goblin
 
-Version: **3.1.0**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
+Version: **3.1.2**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
 
 Upload only the files in this package. Never upload exported settings, private cards, API keys or Hermes data directories. `.gitignore` excludes common private outputs.
 

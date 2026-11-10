@@ -1,7 +1,7 @@
 import { host, useValue } from '@hermes/plugin-sdk';
 import { createElement as h, useState, useEffect } from 'react';
 
-// Goblin Roleplay 3.1.4 — native Hermes Desktop plugin. No remote services.
+// Goblin Roleplay 3.1.5 — native Hermes Desktop plugin. No remote services.
 const ID='goblin-roleplay';
 const MAX_FILE=5*1024*1024;
 const MAX_GUIDANCE=24000;
@@ -61,6 +61,8 @@ function migrate(){
  state.companions??={};
  state.chatStories??={};
  state.colors??={scope:'off',action:'#c7a5eb',dialogue:'#f0e6d2'};
+ state.colors.user??='#d8eaff';
+ state.chatLayout??='goblin';
  state.hostPersonality??='';
  state.useHostPersonality??=false;
 }
@@ -242,7 +244,7 @@ function splitGoblinMessage(value){
 function installContextDisplay(doc){
  const records=new Map(),attr='data-goblin-context-hidden';
  const style=doc.createElement('style');
- style.textContent='['+attr+']{display:none!important}.goblin-message-preview{white-space:pre-wrap;overflow-wrap:anywhere}.goblin-context-toggle{font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:5px;padding:3px 7px;cursor:pointer;opacity:.75;margin-top:6px;}';
+ style.textContent='['+attr+']{display:none!important}.goblin-message-preview{white-space:pre-wrap;overflow-wrap:anywhere}.goblin-context-toggle{font:inherit;font-size:11px!important;line-height:1.4;color:inherit;background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important;min-width:0!important;width:auto!important;padding:2px 0!important;cursor:pointer;opacity:.65;margin-top:4px;}';
  doc.head.appendChild(style);
  const remove=(node,record)=>{node.removeAttribute(attr);record.wrapper.remove();records.delete(node);};
  const scan=()=>{
@@ -259,8 +261,8 @@ function installContextDisplay(doc){
     const wrapper=doc.createElement('div');wrapper.setAttribute('data-goblin-context-control','');
     const preview=doc.createElement('div');preview.className='goblin-message-preview';preview.textContent=body;
     const button=doc.createElement('button');button.type='button';button.className='goblin-context-toggle';
-    const render=(shown)=>{node.toggleAttribute(attr,!shown);preview.hidden=shown;button.textContent=shown?'Hide Goblin context':'Show Goblin context';button.setAttribute('aria-expanded',String(shown));};
-    button.addEventListener('click',()=>render(node.hasAttribute(attr)));
+    const render=(shown)=>{node.toggleAttribute(attr,!shown);preview.hidden=shown;button.textContent=shown?'Context ▾':'Context ▸';button.setAttribute('aria-expanded',String(shown));};
+    button.addEventListener('click',event=>{event.stopPropagation();event.preventDefault();render(node.hasAttribute(attr));});
     wrapper.append(preview,button);node.after(wrapper);records.set(node,{wrapper,raw});render(false);
    }
   }finally{observer.observe(doc.body,{childList:true,subtree:true,characterData:true});}
@@ -272,6 +274,74 @@ function ContextDisplayController(){
  useRefresh();
  useEffect(()=>{if(state.hideContext&&typeof document!=='undefined')return installContextDisplay(document);},[state.hideContext]);
  return null;
+}
+
+function installChatLayout(doc){
+ const style=doc.createElement('style'),marked=new Set(),headers=new Map();
+ const root='[data-goblin-chat-layout]';
+ style.textContent=`
+ ${root} [data-slot="aui_user-message-root"]{position:relative!important;top:auto!important;align-items:flex-end!important;align-self:stretch!important;width:100%!important;max-width:100%!important;margin-inline:0!important;padding-inline:0!important;}
+ ${root} [data-slot="aui_user-bubble-actions"]{width:fit-content!important;max-width:min(85%,44rem)!important;align-self:flex-end!important;}
+ ${root} [data-slot="aui_user-message-text"],${root} .goblin-message-preview{color:var(--goblin-user-text)!important;text-align:start;}
+ ${root} [data-slot="aui_user-bubble-actions"] button:has([data-slot="aui_user-message-text"]){border-radius:18px!important;background:var(--ui-bg-secondary,#252a31)!important;padding:12px 16px!important;width:100%;text-align:start;}
+ ${root} [data-slot="aui_assistant-message-root"]{align-self:flex-start!important;align-items:stretch!important;width:100%!important;max-width:100%!important;margin-inline:0!important;}
+ .goblin-reply-identity{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:12px;color:var(--ui-text-primary,inherit);}
+ .goblin-reply-identity img,.goblin-reply-initial{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+ .goblin-reply-initial{display:grid;place-items:center;background:var(--ui-bg-secondary,#252a31);}
+ @media(max-width:600px){${root} [data-slot="aui_user-bubble-actions"]{max-width:94%!important;}}
+ `;
+ doc.head.appendChild(style);
+ function clearHeader(node){const r=headers.get(node);if(r){r.el.remove();headers.delete(node);}}
+ const paint=()=>{
+  observer.disconnect();
+  try{
+   for(const node of marked){node.removeAttribute('data-goblin-chat-layout');node.style.removeProperty('--goblin-user-text');}marked.clear();
+   const current=focused(),runtime=host.state.focusedSessionId?.get?.();
+   for(const surface of doc.querySelectorAll('[data-chat-surface]')){
+    const anchor=surface.getAttribute('data-session-anchor');
+    const selected=anchor==='session-tile:'+current||(anchor==='workspace'&&runtime&&host.state.activeSessionId?.get?.()===runtime);
+    if(state.chatLayout==='all'||(state.chatLayout==='goblin'&&current&&current===armedSession&&selected)){
+     surface.setAttribute('data-goblin-chat-layout','');surface.style.setProperty('--goblin-user-text',/^#[0-9a-f]{6}$/i.test(state.colors.user)?state.colors.user:'#d8eaff');marked.add(surface);
+    }
+   }
+   const keep=new Set();
+   for(const surface of marked){
+    let character=null;
+    for(const message of surface.querySelectorAll('[data-slot="aui_user-message-root"],[data-slot="aui_assistant-message-root"]')){
+     if(message.getAttribute('data-slot')==='aui_user-message-root'){
+      const raw=message.querySelector('[data-slot="aui_user-message-text"]')?.textContent||'';
+      const name=splitGoblinMessage(raw)!==null?raw.match(/\nCharacter:\n([^\n]+)/)?.[1]:null;
+      const matches=name?state.cards.filter(c=>c.name===name):[];character=matches.length===1?matches[0]:null;
+      continue;
+     }
+     if(!character)continue;
+     keep.add(message);
+     const avatar=/^data:image\/(png|jpeg|webp);base64,/.test(character.avatarData||'')?character.avatarData:'';
+     const signature=JSON.stringify([character.id,character.name,avatar]);const previous=headers.get(message);
+     if(previous&&previous.signature===signature&&previous.el.parentNode===message)continue;
+     clearHeader(message);
+     const el=doc.createElement('div');el.className='goblin-reply-identity';el.setAttribute('data-goblin-reply-identity','');
+     if(avatar){const img=doc.createElement('img');img.src=avatar;img.alt=character.name+' portrait';el.append(img);}
+     else{const initial=doc.createElement('span');initial.className='goblin-reply-initial';initial.textContent=character.name.slice(0,1);initial.setAttribute('aria-hidden','true');el.append(initial);}
+     const name=doc.createElement('span');name.textContent=character.name;el.append(name);message.prepend(el);headers.set(message,{el,signature});
+    }
+   }
+   for(const node of headers.keys())if(!keep.has(node))clearHeader(node);
+  }finally{observer.observe(doc.body,{childList:true,subtree:true,characterData:true});}
+ };
+ const observer=new MutationObserver(paint);paint();
+ return()=>{observer.disconnect();style.remove();for(const node of headers.keys())clearHeader(node);for(const node of marked){node.removeAttribute('data-goblin-chat-layout');node.style.removeProperty('--goblin-user-text');}};
+}
+function ChatLayoutController(){
+ useRefresh();const session=useValue(sessionAtom()),runtime=useValue(host.state.focusedSessionId);
+ const faces=state.cards.map(c=>c.id+c.name+(c.avatarData||'')).join('|');
+ useEffect(()=>{if(state.chatLayout!=='off'&&typeof document!=='undefined')return installChatLayout(document);},[state.chatLayout,state.colors.user,session,runtime,armedSession,faces]);
+ return null;
+}
+function ChatLayoutPanel(){return h('details',null,h('summary',null,'Conversation layout'),
+ h('label',null,'Left/right layout',h('select',{value:state.chatLayout,style:fieldStyle,onChange:e=>{state.chatLayout=e.target.value;save();}},h('option',{value:'goblin'},'Enabled Goblin chat'),h('option',{value:'all'},'All chats'),h('option',{value:'off'},'Hermes default'))),
+ h('label',null,'Your message color ',h('input',{type:'color',value:state.colors.user,onChange:e=>{state.colors.user=e.target.value;save();}})),
+ h('small',null,'Character portraits follow the preceding Goblin message. Upload a face under character settings; otherwise an initial is shown.'));
 }
 
 function ColorController(){
@@ -381,6 +451,8 @@ function Panel(){
   h('p',null,'Select a character, enable this chat, then use Hermes’s normal message box.'),
   btn(active?'ON for this chat — turn off':'Enable for this chat',()=>{const current=focused();if(current&&armedSession===current){armedSession=null;emit();return;}if(!c)return host.notify({kind:'error',message:'Import a character first.'});if(!current)return host.notify({kind:'error',message:'This chat is still initializing. Wait for its first reply to finish, reopen it from the session list, then enable Goblin.'});ensureStory();armedSession=current;emit();}),
   h('small',null,'Off by default after restart. Switching character turns it off. Guidance is added to each sent message, not to Hermes’s system prompt.'),
+  h('details',null,h('summary',{style:{cursor:'pointer',fontWeight:600}},'Goblin settings'),
+  h('div',{style:{display:'flex',flexDirection:'column',gap:12,paddingTop:12}},
   h('label',null,'Import character JSON',h('input',{type:'file',accept:'.json,application/json',onChange:e=>importFile(e,'card'),style:{display:'block',marginTop:6}})),
   h('select',{'aria-label':'Character',style:fieldStyle,value:state.selected,onChange:e=>{state.selected=e.target.value;armedSession=null;save();}},h('option',{value:''},'Choose character'),...state.cards.map(c=>h('option',{key:c.id,value:c.id},c.name))),
   c&&h('details',null,h('summary',null,'Character details & greetings'),
@@ -393,8 +465,8 @@ function Panel(){
   input('Conversation instructions',state.guidance,v=>{state.guidance=v;save();},true),
   c&&h('div',null,portrait(c,80),h('label',null,'Upload chat face',h('input',{type:'file',accept:'image/png,image/jpeg,image/webp',onChange:uploadPortrait,style:{display:'block'}})),c.avatarData&&btn('Remove face',()=>{delete c.avatarData;save();})),
   h('label',null,h('input',{type:'checkbox',checked:state.hideContext,onChange:e=>{state.hideContext=e.target.checked;save();}}),' Hide Goblin context in chat'),
-  h('small',null,'Display only. Your message stays visible. Use Show Goblin context beneath a message to inspect it; prompts and token usage stay unchanged.'),
-  h(FreedomPanel),h(MemoryPanel),h(ColorsPanel),
+  h('small',null,'Display only. Your message stays visible. Use Context ▸ beneath a message to inspect it; prompts and token usage stay unchanged.'),
+  h(ChatLayoutPanel),h(FreedomPanel),h(MemoryPanel),h(ColorsPanel),
   h('h3',null,'Amendments'),
   h('label',null,'Import amendment pack',h('input',{type:'file',accept:'.json,application/json',onChange:importAmendments,style:{display:'block'}})),
   h('small',null,'Same-group choices replace one another. Start with 2–4 relevant options.'),
@@ -410,19 +482,21 @@ function Panel(){
   ...state.books.map((b,i)=>h('div',{key:b.id},h('label',null,h('input',{type:'checkbox',checked:b.enabled,onChange:e=>{b.enabled=e.target.checked;save();}}),` ${b.name} (${b.entries.length} entries) `),btn('Remove',()=>{state.books.splice(i,1);save();}))),
   h('details',null,h('summary',null,'Preview added guidance'),input('Test message for lore matching',previewText,setPreviewText,true),btn('Preview',()=>{try{setPreview(guidance(previewText));}catch(e){setPreview(e.message);}}),h('pre',{style:{whiteSpace:'pre-wrap',wordBreak:'break-word',fontSize:12}},preview)),
   btn('Export Goblin settings backup',()=>download('goblin-roleplay-backup.json',state)),
-  h('small',null,'This panel does not change your model, permissions, tools or global Hermes settings. Card instructions remain subject to your model and provider.')
+  h('small',null,'This panel does not change your model, permissions or tools. Card instructions remain subject to your model and provider.'))),
+  h('small',null,'Close this side panel with its × for more chat space. Reopen with Goblin settings below the chat.')
  );
 }
-function Status(){useRefresh();const id=useValue(sessionAtom());const active=armedSession===id&&id;return h('div',{style:{fontSize:12,padding:6,display:'flex',alignItems:'center',gap:10}},active&&portrait(card(),44),h('span',null,active?'Goblin ON · '+(card()?.name||''):'Goblin OFF'));}
+function Status(){useRefresh();const id=useValue(sessionAtom());const active=armedSession===id&&id;return h('div',{style:{fontSize:12,padding:6,display:'flex',alignItems:'center',gap:10}},active&&portrait(card(),44),h('span',null,active?'Goblin ON · '+(card()?.name||''):'Goblin OFF'),btn('Goblin settings',()=>host.revealPane?.(ID+':panel')));}
 export default {id:ID,name:'Goblin Roleplay',defaultEnabled:true,register(ctx){
  store=ctx.storage;os=ctx.os;state=store.get('settings',initial());migrate();
  if(ctx.onEvent)ctx.onEvent('message.complete',completeTurn);
  else if(host.onEvent){const dispose=host.onEvent('message.complete',completeTurn);ctx.onDispose?.(dispose);}
  ctx.onDispose?.(()=>{inFlight.clear();armedSession=null;subscribers.clear();});
  ctx.register({id:'context-display',area:'titleBar.right',render:()=>h(ContextDisplayController)});
+ ctx.register({id:'chat-layout',area:'titleBar.right',render:()=>h(ChatLayoutController)});
  ctx.register({id:'colors',area:'titleBar.right',render:()=>h(ColorController)});
  // Only our own saved schema is read; arbitrary card extensions never execute.
- ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.4',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
+ ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.5',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
  ctx.register({id:'status',area:'composer.top',render:()=>h(Status)});
  ctx.register({id:'guidance',area:'composer.middleware',order:50,data:{handler:middleware}});
 }};

@@ -1,3 +1,11 @@
+# 3.1.5
+
+- Right-aligned user bubbles with an independent user-text color picker.
+- Left-aligned assistant replies with character portraits/initials matched to preceding Goblin context.
+- Compact Context disclosure link and click propagation protection.
+- Collapsible settings and a composer shortcut to reopen the panel.
+- Scoped/default layout choices and DOM regression tests.
+
 # 3.1.4
 
 - Add Hide Goblin context in chat (on by default), with a per-message Show/Hide button.

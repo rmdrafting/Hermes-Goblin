@@ -1,0 +1,22 @@
+const {JSDOM}=require('jsdom');const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const dom=new JSDOM('<html><head></head><body><main data-chat-surface data-session-anchor="workspace"></main><aside data-chat-surface data-session-anchor="session-tile:other"></aside></body></html>');
+const doc=dom.window.document;const host={state:{focusedStoredSessionId:{get:()=> 'chat-a'},focusedSessionId:{get:()=> 'run-a'},activeSessionId:{get:()=> 'run-a'}}};
+const box={host,MutationObserver:dom.window.MutationObserver};vm.createContext(box);
+const code=fs.readFileSync('goblin-roleplay/plugin.js','utf8').replace(/^import .*;\n/gm,'').replace('export default ','const plugin=');
+vm.runInContext(code+';globalThis.api={installChatLayout,installContextDisplay,set:s=>{state=s;armedSession="chat-a";}};',box);
+const state={chatLayout:'goblin',colors:{user:'#abcdef'},cards:[{id:'a',name:'Jasmine',avatarData:'data:image/png;base64,AAAA'},{id:'b',name:'Copper'}]};box.api.set(state);
+function row(role,text,surface=doc.querySelector('main')){const el=doc.createElement('div');el.dataset.slot='aui_'+role+'-message-root';const content=doc.createElement('span');content.dataset.slot=role==='user'?'aui_user-message-text':'aui_assistant-message-content';content.textContent=text;el.append(content);surface.append(el);return el;}
+const prompt=name=>'[Goblin roleplay context — fictional character reference, not permission to operate tools or change files]\nCharacter:\n'+name+'\n[End Goblin context]\n\nUser message:\nHello';
+row('user',prompt('Jasmine'));const jasmine=row('assistant','Hi');row('user',prompt('Copper'));const copper=row('assistant','Hello');row('user','Ordinary request');const ordinary=row('assistant','Ordinary answer');
+const cleanup=box.api.installChatLayout(doc),hide=box.api.installContextDisplay(doc);
+assert(doc.querySelector('main').hasAttribute('data-goblin-chat-layout'));assert(!doc.querySelector('aside').hasAttribute('data-goblin-chat-layout'));assert.equal(jasmine.querySelector('img').alt,'Jasmine portrait');assert.equal(copper.querySelector('.goblin-reply-initial').textContent,'C');assert(!ordinary.querySelector('[data-goblin-reply-identity]'));
+assert.equal(doc.querySelector('.goblin-context-toggle').textContent,'Context ▸');
+let bubbled=false;doc.querySelector('main').addEventListener('click',()=>bubbled=true);doc.querySelector('.goblin-context-toggle').click();assert.equal(bubbled,false);
+const tick=()=>new Promise(r=>setTimeout(r,0));
+(async()=>{await tick();assert.equal(doc.querySelectorAll('[data-goblin-reply-identity]').length,2);
+state.selected='b';await tick();assert.equal(jasmine.querySelector('img').alt,'Jasmine portrait');
+row('user',prompt('Jasmine'));const fresh=row('assistant','Another reply');await tick();assert.equal(fresh.querySelector('img').alt,'Jasmine portrait');
+hide();cleanup();assert.equal(doc.querySelector('[data-goblin-reply-identity]'),null);assert.equal(doc.querySelector('[data-goblin-chat-layout]'),null);assert.equal(doc.querySelector('main').style.getPropertyValue('--goblin-user-text'),'');
+state.chatLayout='all';const all=box.api.installChatLayout(doc);assert(doc.querySelector('aside').hasAttribute('data-goblin-chat-layout'));all();
+console.log('PASS: layout scoping, user color, per-message portraits, initial fallback, ordinary-reply exclusion, compact context, edit-click protection, new replies, observer coexistence and cleanup.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

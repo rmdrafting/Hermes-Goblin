@@ -1,3 +1,8 @@
+# 3.1.3
+
+- Fix chat colors: mount the color controller in the actual case-sensitive `titleBar.right` SDK slot.
+- Add a registration regression check so this mount failure is caught.
+
 # 3.1.2
 
 - Per-character Reserved/Balanced/Adventurous initiative and three freedom switches.

@@ -1,4 +1,4 @@
-# Hermes Goblin 3.1.3
+# Hermes Goblin 3.1.4
 
 > Bringing Hermes to life.... good thing? i dont know...
 
@@ -22,7 +22,7 @@ Features may break, change, or develop an exciting new interpretation of “work
 
 1. Close Hermes Desktop.
 2. Extract the entire ZIP. Run `INSTALL_WINDOWS.bat` from the extracted folder.
-3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.3**.
+3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.4**.
 4. Open a chat and wait for its first reply. Select a character and click **Enable for this chat**.
 
 The plugin keeps the `goblin-roleplay` ID and `settings` storage key, preserving existing cards, faces and amendments. The installer backs up the previous JavaScript file. It uses `HERMES_HOME` if set, otherwise `%USERPROFILE%\.hermes`. A custom Hermes data directory requires copying `goblin-roleplay/plugin.js` into that instance's `desktop-plugins/goblin-roleplay` folder.
@@ -61,7 +61,7 @@ Boundaries instruct the character to preserve your agency and consent, avoid emo
 
 These are prompt instructions, not an enforced security sandbox. The plugin does not change Hermes tool permissions. Keep real-world tool approvals configured in Hermes. Disabling Goblin triggers no file operations or automatic execution of earlier discussion.
 
-## Recall past stories (3.1.3)
+## Recall past stories (3.1.4)
 
 **Recall relevant earlier chapters** is the default per character. It searches saved story notes by keyword overlap with your outgoing message, includes at most four matching facts (2,400 characters), and makes no extra model call. Asking to remember/recap without a specific topic can retrieve recent ancestor notes. This is lightweight keyword matching, not semantic search or access to old Hermes transcripts.
 
@@ -72,6 +72,12 @@ These are prompt instructions, not an enforced security sandbox. The plugin does
 To continue: select your previous story under **Continue a story**, then click **New chapter — same storyline**. To start independently: click **Fresh alternate storyline**. Alternate timelines, sibling branches, other characters and later chapters are excluded from recall. Persistent character preferences still apply across that character's timelines.
 
 Existing stories are preserved as independent timelines because their relationships were never recorded. Continue from one to build connected chapters; existing unrelated stories are not automatically merged. New Hermes chats initially get independent stories; choose an older one before creating a connected chapter. Use separate Hermes chats when separating timelines, since the plugin cannot remove already-visible transcript history.
+
+## Hide the Goblin context block
+
+**Hide Goblin context in chat** is on by default. Your actual message remains visible, with a **Show Goblin context** button to inspect the original message. Uncheck the switch to show all original context blocks again. This works on matching existing messages as well as newly rendered messages.
+
+This changes display only: it does not remove history, alter what the model receives, reduce tokens, or change the text Hermes copies/exports. Attachments are preserved. Message editing still uses the original complete message. The plugin leaves unrecognized messages alone and restores the original display when disabled. Styling depends on Hermes's user-message markup.
 
 ## Chat colors
 
@@ -108,13 +114,13 @@ node --check goblin-roleplay/plugin.js
 node tests/regression.cjs
 ```
 
-Tests cover durable IDs, persistence, migrations, separate character/story memories, mid-turn character switching, automatic capture, conflict review, limits, and malformed payloads. Mock tests do not replace real Hermes testing.
+Tests cover durable IDs, persistence, migrations, separate character/story memories, mid-turn character switching, automatic capture, conflict review, limits, and malformed payloads. Mock tests do not replace real Hermes testing. For DOM display tests, use Node 24+, run `npm install`, then `npm run test:display`. Test dependencies are not needed to install or run the plugin.
 
 ## GitHub
 
 Repository: https://github.com/rmdrafting/Hermes-Goblin
 
-Version: **3.1.3**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
+Version: **3.1.4**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
 
 Upload only the files in this package. Never upload exported settings, private cards, API keys or Hermes data directories. `.gitignore` excludes common private outputs.
 

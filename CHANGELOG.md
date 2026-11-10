@@ -1,3 +1,10 @@
+# 3.1.4
+
+- Add Hide Goblin context in chat (on by default), with a per-message Show/Hide button.
+- Preserve original message text, model context, attachments and token usage.
+- Restore display on toggle-off/unload and handle newly rendered or edited messages.
+- Add DOM regression tests for display and cleanup.
+
 # 3.1.3
 
 - Fix chat colors: mount the color controller in the actual case-sensitive `titleBar.right` SDK slot.

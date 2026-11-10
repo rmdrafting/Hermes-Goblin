@@ -1,1 +1,14 @@
-{"name":"hermes-goblin","version":"3.1.3","private":true,"description":"Character cards, companion memory, amendments and chat colors for Hermes Desktop","scripts":{"test":"node tests/regression.cjs","check":"node --check goblin-roleplay/plugin.js"}}
+{
+  "name": "hermes-goblin",
+  "version": "3.1.4",
+  "private": true,
+  "description": "Character cards, companion memory, amendments and chat colors for Hermes Desktop",
+  "scripts": {
+    "test": "node tests/regression.cjs",
+    "check": "node --check goblin-roleplay/plugin.js",
+    "test:display": "node tests/context-display.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "30.1.3"
+  }
+}

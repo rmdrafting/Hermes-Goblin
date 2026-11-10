@@ -1,11 +1,12 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
 const source=fs.readFileSync('goblin-roleplay/plugin.js','utf8').replace(/^import .*;\n/gm,'').replace('export default ','const plugin = ');
-let runtime='run-a',stored='chat-a',saved,events={},disposals=[];
+let runtime='run-a',stored='chat-a',saved,events={},disposals=[],registrations=[];
 const atom=get=>({get});
 const box={structuredClone,crypto:require('crypto').webcrypto,host:{state:{focusedSessionId:atom(()=>runtime),focusedStoredSessionId:atom(()=>stored),activeSessionId:atom(()=>runtime)},notify:()=>{}},useValue:a=>a.get(),h:(type,props,...children)=>({type,props,children}),useState:()=>['',()=>{}],useEffect:()=>{}};
 vm.createContext(box);vm.runInContext(source+`;globalThis.t={plugin,pastRecall,freedomText,FreedomPanel,normalizeCard,middleware,companion,currentStory,newStory,chooseStory,completeTurn,processMemory,acceptMemory,memoryText,writeFact,Panel,ColorController,ColorsPanel,MemoryPanel,inFlight,getState:()=>state,arm:()=>armedSession=focused(),select:id=>{state.selected=id;armedSession=null;},setState:s=>state=s};`,box);
 const t=box.t;
-t.plugin.register({storage:{get:(k,d)=>d,set:(k,s)=>saved=structuredClone(s)},register:()=>{},onEvent:(k,f)=>events[k]=f,onDispose:f=>disposals.push(f)});
+t.plugin.register({storage:{get:(k,d)=>d,set:(k,s)=>saved=structuredClone(s)},register:c=>registrations.push(c),onEvent:(k,f)=>events[k]=f,onDispose:f=>disposals.push(f)});
+assert(registrations.some(c=>c.id==='colors'&&c.area==='titleBar.right'), 'Color controller must mount in Hermes’s case-sensitive titleBar.right slot');
 const a=t.normalizeCard({name:'Jasmine',description:'A gentle garden lover.'}),b=t.normalizeCard({name:'Copper',description:'An adventurous mechanic.'});
 const state=t.getState();state.cards.push(a,b);state.selected=a.id;
 const draft={text:'What is your favorite color?',attachments:[{id:'image'}]};

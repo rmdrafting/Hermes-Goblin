@@ -1,7 +1,7 @@
 import { host, useValue } from '@hermes/plugin-sdk';
 import { createElement as h, useState, useEffect } from 'react';
 
-// Goblin Roleplay 3.1.2 — native Hermes Desktop plugin. No remote services.
+// Goblin Roleplay 3.1.3 — native Hermes Desktop plugin. No remote services.
 const ID='goblin-roleplay';
 const MAX_FILE=5*1024*1024;
 const MAX_GUIDANCE=24000;
@@ -371,9 +371,9 @@ export default {id:ID,name:'Goblin Roleplay',defaultEnabled:true,register(ctx){
  if(ctx.onEvent)ctx.onEvent('message.complete',completeTurn);
  else if(host.onEvent){const dispose=host.onEvent('message.complete',completeTurn);ctx.onDispose?.(dispose);}
  ctx.onDispose?.(()=>{inFlight.clear();armedSession=null;subscribers.clear();});
- ctx.register({id:'colors',area:'titlebar.right',render:()=>h(ColorController)});
+ ctx.register({id:'colors',area:'titleBar.right',render:()=>h(ColorController)});
  // Only our own saved schema is read; arbitrary card extensions never execute.
- ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.2',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
+ ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.3',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
  ctx.register({id:'status',area:'composer.top',render:()=>h(Status)});
  ctx.register({id:'guidance',area:'composer.middleware',order:50,data:{handler:middleware}});
 }};

@@ -1,4 +1,4 @@
-# Hermes Goblin 3.1.2
+# Hermes Goblin 3.1.3
 
 > Bringing Hermes to life.... good thing? i dont know...
 
@@ -22,7 +22,7 @@ Features may break, change, or develop an exciting new interpretation of “work
 
 1. Close Hermes Desktop.
 2. Extract the entire ZIP. Run `INSTALL_WINDOWS.bat` from the extracted folder.
-3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.2**.
+3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.3**.
 4. Open a chat and wait for its first reply. Select a character and click **Enable for this chat**.
 
 The plugin keeps the `goblin-roleplay` ID and `settings` storage key, preserving existing cards, faces and amendments. The installer backs up the previous JavaScript file. It uses `HERMES_HOME` if set, otherwise `%USERPROFILE%\.hermes`. A custom Hermes data directory requires copying `goblin-roleplay/plugin.js` into that instance's `desktop-plugins/goblin-roleplay` folder.
@@ -61,7 +61,7 @@ Boundaries instruct the character to preserve your agency and consent, avoid emo
 
 These are prompt instructions, not an enforced security sandbox. The plugin does not change Hermes tool permissions. Keep real-world tool approvals configured in Hermes. Disabling Goblin triggers no file operations or automatic execution of earlier discussion.
 
-## Recall past stories (3.1.2)
+## Recall past stories (3.1.3)
 
 **Recall relevant earlier chapters** is the default per character. It searches saved story notes by keyword overlap with your outgoing message, includes at most four matching facts (2,400 characters), and makes no extra model call. Asking to remember/recap without a specific topic can retrieve recent ancestor notes. This is lightweight keyword matching, not semantic search or access to old Hermes transcripts.
 
@@ -114,7 +114,7 @@ Tests cover durable IDs, persistence, migrations, separate character/story memor
 
 Repository: https://github.com/rmdrafting/Hermes-Goblin
 
-Version: **3.1.2**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
+Version: **3.1.3**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
 
 Upload only the files in this package. Never upload exported settings, private cards, API keys or Hermes data directories. `.gitignore` excludes common private outputs.
 

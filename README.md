@@ -1,4 +1,4 @@
-# Hermes Goblin 3.1.4
+# Hermes Goblin 3.1.5
 
 > Bringing Hermes to life.... good thing? i dont know...
 
@@ -22,7 +22,7 @@ Features may break, change, or develop an exciting new interpretation of “work
 
 1. Close Hermes Desktop.
 2. Extract the entire ZIP. Run `INSTALL_WINDOWS.bat` from the extracted folder.
-3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.4**.
+3. Reopen Hermes. The panel title is **Goblin Roleplay 3.1.5**.
 4. Open a chat and wait for its first reply. Select a character and click **Enable for this chat**.
 
 The plugin keeps the `goblin-roleplay` ID and `settings` storage key, preserving existing cards, faces and amendments. The installer backs up the previous JavaScript file. It uses `HERMES_HOME` if set, otherwise `%USERPROFILE%\.hermes`. A custom Hermes data directory requires copying `goblin-roleplay/plugin.js` into that instance's `desktop-plugins/goblin-roleplay` folder.
@@ -61,7 +61,7 @@ Boundaries instruct the character to preserve your agency and consent, avoid emo
 
 These are prompt instructions, not an enforced security sandbox. The plugin does not change Hermes tool permissions. Keep real-world tool approvals configured in Hermes. Disabling Goblin triggers no file operations or automatic execution of earlier discussion.
 
-## Recall past stories (3.1.4)
+## Recall past stories (3.1.5)
 
 **Recall relevant earlier chapters** is the default per character. It searches saved story notes by keyword overlap with your outgoing message, includes at most four matching facts (2,400 characters), and makes no extra model call. Asking to remember/recap without a specific topic can retrieve recent ancestor notes. This is lightweight keyword matching, not semantic search or access to old Hermes transcripts.
 
@@ -75,9 +75,21 @@ Existing stories are preserved as independent timelines because their relationsh
 
 ## Hide the Goblin context block
 
-**Hide Goblin context in chat** is on by default. Your actual message remains visible, with a **Show Goblin context** button to inspect the original message. Uncheck the switch to show all original context blocks again. This works on matching existing messages as well as newly rendered messages.
+**Hide Goblin context in chat** is on by default. Your actual message remains visible, with a **Context ▸** button to inspect the original message. Uncheck the switch to show all original context blocks again. This works on matching existing messages as well as newly rendered messages.
 
 This changes display only: it does not remove history, alter what the model receives, reduce tokens, or change the text Hermes copies/exports. Attachments are preserved. Message editing still uses the original complete message. The plugin leaves unrecognized messages alone and restores the original display when disabled. Styling depends on Hermes's user-message markup.
+
+## Conversation layout (3.1.5)
+
+In **Goblin settings → Conversation layout**, choose Enabled Goblin chat (default), All chats, or Hermes default. Your messages use compact right-aligned bubbles and a separate **Your message color** picker. Character replies stay on the left; action/dialogue colors remain controlled by Chat colors.
+
+A character name and uploaded portrait appear above replies whose preceding user message identifies a uniquely named imported Goblin character. Without a portrait, an initial appears. Ordinary Hermes replies are not assigned a character. If multiple cards share the same name, the plugin avoids guessing; rename them distinctly for portrait matching. Virtualized replies without their preceding user message on screen may lack a portrait.
+
+The context control is now a small **Context ▸ / Context ▾** text-style button. The **Hide Goblin context in chat** switch still controls whether context is hidden.
+
+Settings are collapsed under **Goblin settings** in the side panel. Close the side panel using Hermes's × to give the conversation more width; reopen it with **Goblin settings** below the chat. No separate chat application is installed.
+
+These display changes depend on Hermes's chat markup and need live installation testing. They preserve the underlying messages, attachments, model configuration and memories. Developer DOM tests: `npm run test:layout` after `npm install` with Node 24+.
 
 ## Chat colors
 
@@ -120,7 +132,7 @@ Tests cover durable IDs, persistence, migrations, separate character/story memor
 
 Repository: https://github.com/rmdrafting/Hermes-Goblin
 
-Version: **3.1.4**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
+Version: **3.1.5**. Download through **Code → Download ZIP**, extract, and follow the installation steps above.
 
 Upload only the files in this package. Never upload exported settings, private cards, API keys or Hermes data directories. `.gitignore` excludes common private outputs.
 

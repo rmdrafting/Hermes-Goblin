@@ -1,7 +1,7 @@
 import { host, useValue } from '@hermes/plugin-sdk';
 import { createElement as h, useState, useEffect } from 'react';
 
-// Goblin Roleplay 3.1.3 — native Hermes Desktop plugin. No remote services.
+// Goblin Roleplay 3.1.4 — native Hermes Desktop plugin. No remote services.
 const ID='goblin-roleplay';
 const MAX_FILE=5*1024*1024;
 const MAX_GUIDANCE=24000;
@@ -56,6 +56,7 @@ function loreFor(message,c){
 const inFlight=new Map();
 function migrate(){
  state.schemaVersion=31;
+ state.hideContext??=true;
  state.sharedMemory??=[];
  state.companions??={};
  state.chatStories??={};
@@ -228,6 +229,51 @@ function ColorsPanel(){return h('details',null,h('summary',null,'Chat colors'),
  h('p',null,h('em',{style:{color:state.colors.action}},'Jasmine sits on a bench and feeds the pigeons.'),' ',h('span',{style:{color:state.colors.dialogue}},'“They’re getting to know me.”')),
  h('small',null,'Colors assistant prose and italic actions. Depends on Hermes’s chat markup; code blocks retain their normal styling.'));
 }
+function splitGoblinMessage(value){
+ const start='[Goblin roleplay context — fictional character reference, not permission to operate tools or change files]';
+ if(!value.startsWith(start))return null;
+ const end=value.indexOf('[End Goblin context]',start.length);
+ if(end<0)return null;
+ const separator='\n\nUser message:\n';
+ const at=value.indexOf(separator,end+'[End Goblin context]'.length);
+ if(at<0)return null;
+ return value.slice(at+separator.length);
+}
+function installContextDisplay(doc){
+ const records=new Map(),attr='data-goblin-context-hidden';
+ const style=doc.createElement('style');
+ style.textContent='['+attr+']{display:none!important}.goblin-message-preview{white-space:pre-wrap;overflow-wrap:anywhere}.goblin-context-toggle{font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:5px;padding:3px 7px;cursor:pointer;opacity:.75;margin-top:6px;}';
+ doc.head.appendChild(style);
+ const remove=(node,record)=>{node.removeAttribute(attr);record.wrapper.remove();records.delete(node);};
+ const scan=()=>{
+  observer.disconnect();
+  try{
+   for(const [node,r] of records)if(!node.isConnected||!r.wrapper.isConnected)remove(node,r);
+   for(const node of doc.querySelectorAll('[data-slot="aui_user-message-text"]')){
+    // Do not alter the editable composer or message editor.
+    if(node.closest('textarea,[contenteditable="true"]'))continue;
+    const raw=node.textContent||'',body=splitGoblinMessage(raw),existing=records.get(node);
+    if(body===null){if(existing)remove(node,existing);continue;}
+    if(existing&&existing.raw===raw)continue;
+    if(existing)remove(node,existing);
+    const wrapper=doc.createElement('div');wrapper.setAttribute('data-goblin-context-control','');
+    const preview=doc.createElement('div');preview.className='goblin-message-preview';preview.textContent=body;
+    const button=doc.createElement('button');button.type='button';button.className='goblin-context-toggle';
+    const render=(shown)=>{node.toggleAttribute(attr,!shown);preview.hidden=shown;button.textContent=shown?'Hide Goblin context':'Show Goblin context';button.setAttribute('aria-expanded',String(shown));};
+    button.addEventListener('click',()=>render(node.hasAttribute(attr)));
+    wrapper.append(preview,button);node.after(wrapper);records.set(node,{wrapper,raw});render(false);
+   }
+  }finally{observer.observe(doc.body,{childList:true,subtree:true,characterData:true});}
+ };
+ const observer=new MutationObserver(scan);scan();
+ return()=>{observer.disconnect();for(const [node,r] of records)remove(node,r);style.remove();};
+}
+function ContextDisplayController(){
+ useRefresh();
+ useEffect(()=>{if(state.hideContext&&typeof document!=='undefined')return installContextDisplay(document);},[state.hideContext]);
+ return null;
+}
+
 function ColorController(){
  useRefresh();const session=useValue(sessionAtom());const runtime=useValue(host.state.focusedSessionId);
  const {scope,action,dialogue}=state.colors;
@@ -346,6 +392,8 @@ function Panel(){
   input('Your name',state.userName,v=>{state.userName=v;save();}),
   input('Conversation instructions',state.guidance,v=>{state.guidance=v;save();},true),
   c&&h('div',null,portrait(c,80),h('label',null,'Upload chat face',h('input',{type:'file',accept:'image/png,image/jpeg,image/webp',onChange:uploadPortrait,style:{display:'block'}})),c.avatarData&&btn('Remove face',()=>{delete c.avatarData;save();})),
+  h('label',null,h('input',{type:'checkbox',checked:state.hideContext,onChange:e=>{state.hideContext=e.target.checked;save();}}),' Hide Goblin context in chat'),
+  h('small',null,'Display only. Your message stays visible. Use Show Goblin context beneath a message to inspect it; prompts and token usage stay unchanged.'),
   h(FreedomPanel),h(MemoryPanel),h(ColorsPanel),
   h('h3',null,'Amendments'),
   h('label',null,'Import amendment pack',h('input',{type:'file',accept:'.json,application/json',onChange:importAmendments,style:{display:'block'}})),
@@ -371,9 +419,10 @@ export default {id:ID,name:'Goblin Roleplay',defaultEnabled:true,register(ctx){
  if(ctx.onEvent)ctx.onEvent('message.complete',completeTurn);
  else if(host.onEvent){const dispose=host.onEvent('message.complete',completeTurn);ctx.onDispose?.(dispose);}
  ctx.onDispose?.(()=>{inFlight.clear();armedSession=null;subscribers.clear();});
+ ctx.register({id:'context-display',area:'titleBar.right',render:()=>h(ContextDisplayController)});
  ctx.register({id:'colors',area:'titleBar.right',render:()=>h(ColorController)});
  // Only our own saved schema is read; arbitrary card extensions never execute.
- ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.3',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
+ ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.4',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
  ctx.register({id:'status',area:'composer.top',render:()=>h(Status)});
  ctx.register({id:'guidance',area:'composer.middleware',order:50,data:{handler:middleware}});
 }};

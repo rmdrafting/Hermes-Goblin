@@ -1,3 +1,10 @@
+# 3.1.6
+
+- Move enable/disable from the side panel to the chat composer to avoid pane-focus session mismatches.
+- Resolve tile identity from the clicked chat surface; reject unresolved targets instead of enabling another chat.
+- Create story context on first send, when the chat is authoritative.
+- Existing prompt-writing skills do not need to be recreated; no skill execution or tool permissions are added by this update.
+
 # 3.1.5
 
 - Right-aligned user bubbles with an independent user-text color picker.

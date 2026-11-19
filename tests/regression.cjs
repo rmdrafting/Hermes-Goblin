@@ -3,7 +3,7 @@ const source=fs.readFileSync('goblin-roleplay/plugin.js','utf8').replace(/^impor
 let runtime='run-a',stored='chat-a',saved,events={},disposals=[],registrations=[];
 const atom=get=>({get});
 const box={structuredClone,crypto:require('crypto').webcrypto,host:{state:{focusedSessionId:atom(()=>runtime),focusedStoredSessionId:atom(()=>stored),activeSessionId:atom(()=>runtime)},notify:()=>{}},useValue:a=>a.get(),h:(type,props,...children)=>({type,props,children}),useState:()=>['',()=>{}],useEffect:()=>{}};
-vm.createContext(box);vm.runInContext(source+`;globalThis.t={plugin,pastRecall,freedomText,FreedomPanel,normalizeCard,middleware,companion,currentStory,newStory,chooseStory,completeTurn,processMemory,acceptMemory,memoryText,writeFact,Panel,ColorController,ColorsPanel,MemoryPanel,inFlight,getState:()=>state,arm:()=>armedSession=focused(),select:id=>{state.selected=id;armedSession=null;},setState:s=>state=s};`,box);
+vm.createContext(box);vm.runInContext(source+`;globalThis.t={plugin,composerSession,toggleComposer,pastRecall,freedomText,FreedomPanel,normalizeCard,middleware,companion,currentStory,newStory,chooseStory,completeTurn,processMemory,acceptMemory,memoryText,writeFact,Panel,ColorController,ColorsPanel,MemoryPanel,inFlight,getState:()=>state,arm:()=>armedSession=focused(),select:id=>{state.selected=id;armedSession=null;},setState:s=>state=s};`,box);
 const t=box.t;
 t.plugin.register({storage:{get:(k,d)=>d,set:(k,s)=>saved=structuredClone(s)},register:c=>registrations.push(c),onEvent:(k,f)=>events[k]=f,onDispose:f=>disposals.push(f)});
 assert(registrations.some(c=>c.id==='colors'&&c.area==='titleBar.right'), 'Color controller must mount in Hermes’s case-sensitive titleBar.right slot');
@@ -73,3 +73,20 @@ t.completeTurn({session_id:runtime,payload:{text:block(capture,[{scope:'characte
 assert.equal(personality.facts.length,oldCount);assert(t.currentStory().facts.some(f=>f.key==='weather'));
 t.select(b.id);assert.equal(t.companion().initiative,'adventurous');assert.equal(t.companion().developPreferences,true);t.FreedomPanel();
 console.log('PASS: recall relevance, caps, ancestor-only retrieval, alternate/sibling/future/character isolation, ask-first gating, legacy migration, freedom controls and preference-capture switch.');
+
+// A side pane reports primary A while the clicked chat surface is tile B.
+const target=anchor=>({closest:()=>({getAttribute:()=>anchor})});
+stored='chat-a';runtime='run-primary';t.select(a.id);
+assert.equal(t.composerSession(target('session-tile:chat-b')),'chat-b');
+t.toggleComposer({currentTarget:target('session-tile:chat-b')});
+assert.equal(t.middleware(draft),draft,'must not accidentally enable the primary');
+stored='chat-b';runtime='run-tile';assert(t.middleware(draft).text.includes('Goblin'));
+// Moving back to pane/primary and then tile keeps the correct authorization.
+stored='chat-a';assert.equal(t.middleware(draft),draft);
+stored='chat-b';assert(t.middleware(draft).text.includes('Goblin'));
+t.toggleComposer({currentTarget:target('session-tile:chat-b')});assert.equal(t.middleware(draft),draft);
+assert.equal(t.composerSession({closest:()=>null}),null);
+assert.equal(t.composerSession(target('unknown')),null);
+assert.equal(t.composerSession(target('session-tile:')),null);
+stored=null;assert.equal(t.composerSession(target('workspace')),null);
+console.log('PASS: composer-bound enable/disable, pane-to-tile focus changes, other-chat isolation and unresolved-target rejection.');

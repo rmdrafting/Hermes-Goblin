@@ -1,7 +1,7 @@
 import { host, useValue } from '@hermes/plugin-sdk';
 import { createElement as h, useState, useEffect } from 'react';
 
-// Goblin Roleplay 3.1.5 — native Hermes Desktop plugin. No remote services.
+// Goblin Roleplay 3.1.6 — native Hermes Desktop plugin. No remote services.
 const ID='goblin-roleplay';
 const MAX_FILE=5*1024*1024;
 const MAX_GUIDANCE=24000;
@@ -445,11 +445,11 @@ async function importFile(event,kind){
 }
 function Panel(){
  useRefresh();const session=useValue(sessionAtom());const [preview,setPreview]=useState('');const [previewText,setPreviewText]=useState('');
- const c=card(),active=Boolean(session&&armedSession===session);
+ const c=card();
  return h('div',{style:{padding:16,display:'flex',flexDirection:'column',gap:12,height:'100%',overflow:'auto',fontSize:13}},
   h('h2',{style:{fontSize:20,margin:0}},'Goblin Roleplay'),
   h('p',null,'Select a character, enable this chat, then use Hermes’s normal message box.'),
-  btn(active?'ON for this chat — turn off':'Enable for this chat',()=>{const current=focused();if(current&&armedSession===current){armedSession=null;emit();return;}if(!c)return host.notify({kind:'error',message:'Import a character first.'});if(!current)return host.notify({kind:'error',message:'This chat is still initializing. Wait for its first reply to finish, reopen it from the session list, then enable Goblin.'});ensureStory();armedSession=current;emit();}),
+  h('small',null,'Use Enable Goblin below the message box in the chat you want. The side panel can change Hermes’s focused session.'),
   h('small',null,'Off by default after restart. Switching character turns it off. Guidance is added to each sent message, not to Hermes’s system prompt.'),
   h('details',null,h('summary',{style:{cursor:'pointer',fontWeight:600}},'Goblin settings'),
   h('div',{style:{display:'flex',flexDirection:'column',gap:12,paddingTop:12}},
@@ -486,7 +486,26 @@ function Panel(){
   h('small',null,'Close this side panel with its × for more chat space. Reopen with Goblin settings below the chat.')
  );
 }
-function Status(){useRefresh();const id=useValue(sessionAtom());const active=armedSession===id&&id;return h('div',{style:{fontSize:12,padding:6,display:'flex',alignItems:'center',gap:10}},active&&portrait(card(),44),h('span',null,active?'Goblin ON · '+(card()?.name||''):'Goblin OFF'),btn('Goblin settings',()=>host.revealPane?.(ID+':panel')));}
+// Enable from the actual composer, never from the plugin pane: focusing a
+// contributed pane can make Hermes report the route's primary instead of a tile.
+function composerSession(target){
+ const surface=target?.closest?.('[data-chat-surface]');
+ if(!surface)return null;
+ const anchor=surface.getAttribute('data-session-anchor')||'';
+ if(anchor.startsWith('session-tile:')&&host.state.focusedStoredSessionId)return anchor.slice('session-tile:'.length)||null;
+ if(anchor==='workspace'&&host.state.focusedSessionId?.get?.()===host.state.activeSessionId?.get?.())return focused();
+ return null;
+}
+function toggleComposer(event){
+ const current=composerSession(event.currentTarget);
+ if(!current)return host.notify({kind:'info',message:'Click into the chat, wait for its first reply, then try Enable Goblin again.'});
+ if(armedSession===current){armedSession=null;emit();return;}
+ if(!card())return host.notify({kind:'error',message:'Select or import a character in Goblin settings first.'});
+ armedSession=current;emit();
+ // Story creation happens at send time, when the composer is authoritative.
+}
+function Status(){useRefresh();useValue(sessionAtom());const [node,setNode]=useState(null);const id=composerSession(node);const active=armedSession===id&&id;return h('div',{ref:setNode,style:{fontSize:12,padding:6,display:'flex',alignItems:'center',gap:10}},active&&portrait(card(),44),h('span',null,card()?.name||'Select a character'),btn(active?'Disable Goblin':'Enable Goblin',toggleComposer),btn('Goblin settings',()=>host.revealPane?.(ID+':panel')));}
+
 export default {id:ID,name:'Goblin Roleplay',defaultEnabled:true,register(ctx){
  store=ctx.storage;os=ctx.os;state=store.get('settings',initial());migrate();
  if(ctx.onEvent)ctx.onEvent('message.complete',completeTurn);
@@ -496,7 +515,7 @@ export default {id:ID,name:'Goblin Roleplay',defaultEnabled:true,register(ctx){
  ctx.register({id:'chat-layout',area:'titleBar.right',render:()=>h(ChatLayoutController)});
  ctx.register({id:'colors',area:'titleBar.right',render:()=>h(ColorController)});
  // Only our own saved schema is read; arbitrary card extensions never execute.
- ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.5',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
+ ctx.register({id:'panel',area:'panes',title:'Goblin Roleplay 3.1.6',data:{placement:'right',width:'360px'},render:()=>h(Panel)});
  ctx.register({id:'status',area:'composer.top',render:()=>h(Status)});
  ctx.register({id:'guidance',area:'composer.middleware',order:50,data:{handler:middleware}});
 }};
